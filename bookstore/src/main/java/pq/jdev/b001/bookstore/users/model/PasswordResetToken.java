@@ -53,13 +53,19 @@ public class PasswordResetToken {
         this.expiryDate = expiryDate;
     }
 
-    public void setExpiryDate(int minutes){
+    public void setExpiryDate(){
         Calendar now = Calendar.getInstance();
-        now.add(Calendar.MINUTE, minutes);
+        now.add(Calendar.MINUTE, 180);
         this.expiryDate = now.getTime();
     }
 
     public boolean isExpired() {
         return new Date().after(this.expiryDate);
     }
+
+	@Override
+	public String toString() {
+		return "PasswordResetToken [id=" + id + ", token=" + token + ", person=" + person + ", expiryDate=" + expiryDate
+				+ "]";
+	}
 }

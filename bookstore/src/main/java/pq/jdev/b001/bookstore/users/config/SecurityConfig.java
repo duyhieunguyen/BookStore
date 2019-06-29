@@ -19,11 +19,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests().antMatchers("/","/registration**", "/forgot-password**", "/reset-password**").permitAll()
-				.antMatchers("/js/**", "/css/**", "/img/**", "/webjars/**").permitAll().anyRequest().authenticated()
-				.and().formLogin().loginPage("/login").permitAll().and().logout().invalidateHttpSession(true)
-				.clearAuthentication(true).logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-				.logoutSuccessUrl("/login?logout").permitAll();
+		http
+			.authorizeRequests()
+			.antMatchers("/**","/registration**", "/forgot-password**", "/reset-password**").permitAll()
+				.antMatchers("/js/**", "/css/**", "/img/**", "/webjars/**","/subpage**").permitAll()
+				.anyRequest().authenticated()
+				.and().formLogin().loginPage("/login")
+				.defaultSuccessUrl("/subpage").permitAll()
+				.and().logout().invalidateHttpSession(true)
+				.clearAuthentication(true)
+				.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+				.logoutSuccessUrl("/login?logout").permitAll().and().exceptionHandling()
+                .accessDeniedPage("/403");
 	}
 
 	@Bean

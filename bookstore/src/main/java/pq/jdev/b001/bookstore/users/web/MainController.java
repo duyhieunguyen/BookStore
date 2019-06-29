@@ -10,14 +10,19 @@ public class MainController {
 	public String root() {
 		return "index";
 	}
-
+	
 	@GetMapping("/login")
 	public String login(Model model) {
 		return "login";
 	}
-
-	@GetMapping("/user")
+	
+	@GetMapping("/subpage")
 	public String userIndex() {
-		return "user/index";
+		return "subpage";
 	}
+	
+	@GetMapping("/403")
+    public String accessDenied() {
+        return "403";
+    }
 }

@@ -58,7 +58,8 @@ public class PasswordFogotController {
 	        PasswordResetToken token = new PasswordResetToken();
 	        token.setToken(UUID.randomUUID().toString());
 	        token.setPerson(person);
-	        token.setExpiryDate(30);
+	       
+	        token.setExpiryDate();
 	        tokenRepository.save(token);
 
 	        Mail mail = new Mail();
