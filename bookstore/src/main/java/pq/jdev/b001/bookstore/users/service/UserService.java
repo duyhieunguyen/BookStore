@@ -1,23 +1,51 @@
 package pq.jdev.b001.bookstore.users.service;
 
-import java.text.ParseException;
+import java.util.List;
 
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import pq.jdev.b001.bookstore.users.model.PasswordResetToken;
 import pq.jdev.b001.bookstore.users.model.Person;
-import pq.jdev.b001.bookstore.users.web.dto.UserRegistrationDto;
+import pq.jdev.b001.bookstore.users.model.Role;
+import pq.jdev.b001.bookstore.users.web.dto.AdminDto;
+import pq.jdev.b001.bookstore.users.web.dto.AdminUpdateInfoUserDto;
+import pq.jdev.b001.bookstore.users.web.dto.UserDto;
+import pq.jdev.b001.bookstore.users.web.dto.UserUpdateInfoDto;
 
 public interface UserService extends UserDetailsService {
 
-//    Person findByEmailOrUsername(String email,String username);
-    Person findByEmail(String email);
-    Person findByUsername(String username);
+	Person findByUsername(String userName);
 
-    Person save(UserRegistrationDto registration);
+	Person findByEmail(String email);
+	
+	Person findById(Long id);
+	
+	List<Person> findAll();
+	
+	List<Role> findAllRole();
 
-    void updatePassword(String password, Long personId);
+	Person save(AdminDto adminDto);
 
+	Person save(UserDto userDto);
+	
+	Person save(UserUpdateInfoDto userDto);
+	
+	Person save(AdminUpdateInfoUserDto userDto);
+	
+	UserUpdateInfoDto updateInfo(Person p);
+	
+	AdminUpdateInfoUserDto updateUserInfo(Person p);	
 
+	void updatePassword(String password, Long personId);
+	
+	void delete(Long id);
+
+	PasswordResetToken findByToken(String token);
+
+	void deleteByToken(PasswordResetToken token);
+
+	void saveToken(PasswordResetToken token);
+	
+	void deleteTokenByIdPerson(long id);
+	
 }

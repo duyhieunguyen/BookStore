@@ -4,6 +4,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import pq.jdev.b001.bookstore.users.constraint.FieldMatch;
 
+@SuppressWarnings("deprecation")
 @FieldMatch(first = "password", second = "confirmPassword", message = "The password fields must match")
 public class PasswordResetDto {
 
@@ -13,7 +14,7 @@ public class PasswordResetDto {
     @NotEmpty
     private String confirmPassword;
 
-    @NotEmpty
+	@NotEmpty
     private String token;
 
     public String getPassword() {

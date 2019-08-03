@@ -1,18 +1,30 @@
 package pq.jdev.b001.bookstore.users.model;
 
+import java.io.Serializable;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
 
 @Entity
-public class Role {
-
+@Table(name = "role")
+public class Role implements Serializable{
+	private static final long serialVersionUID = 1L;
+	
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-
+    
+    @ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	private Set<Person> person;
+    
     public Role() {
     }
 
@@ -20,7 +32,7 @@ public class Role {
         this.name = name;
     }
 
-    public Long getId() {
+	public Long getId() {
         return id;
     }
 
@@ -28,19 +40,19 @@ public class Role {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    @Override
-    public String toString() {
-        return "Role{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                '}';
-    }
+	public Set<Person> getPerson() {
+		return person;
+	}
+
+	public void setPerson(Set<Person> person) {
+		this.person = person;
+	}
 }
