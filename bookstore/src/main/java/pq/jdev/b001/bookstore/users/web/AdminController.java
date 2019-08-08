@@ -92,28 +92,26 @@ public class AdminController {
 	public String showUpdateInfoForm() {
 		return "redirect:/listUser/page/1";
 	}
-	
+
 	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/page/{pageNumber}")
-	public String showListUser(HttpServletRequest request, @PathVariable int pageNumber, Model model, ModelMap map, Principal principal) {
+	public String showListUser(HttpServletRequest request, @PathVariable int pageNumber, Model model, ModelMap map,
+			Principal principal) {
 		map.addAttribute("header", "header_admin");
 		map.addAttribute("footer", "footer_admin");
-		
-		PagedListHolder<?> pages = (PagedListHolder<?>) request.getSession().getAttribute("listUsers");
+
+
+		List<Person> list = (List<Person>) getList(principal);
+
 		int pagesize = 8;
-		List<Person> list = (List<Person>)getList(principal);
-		model.addAttribute("list", list);
-		if (pages == null) {
-			pages = new PagedListHolder<>(list);
-			pages.setPageSize(pagesize);
-		} else {
-			final int goToPage = pageNumber - 1;
-			if (goToPage <= pages.getPageCount() && goToPage >= 0) {
-				pages.setPage(goToPage);
-			}
+		PagedListHolder<?> pages = new PagedListHolder<>(list) ;
+		pages.setPageSize(pagesize);
+
+		final int goToPage = pageNumber - 1;
+		if (goToPage <= pages.getPageCount() && goToPage >= 0) {
+			pages.setPage(goToPage);
 		}
-		
-		request.getSession().setAttribute("listUsers", pages);
+
 		int current = pages.getPage() + 1;
 		int begin = Math.max(1, current - list.size());
 		int end = Math.min(begin + 5, pages.getPageCount());
@@ -147,7 +145,8 @@ public class AdminController {
 
 	@PostMapping(value = "/edit-user-{id}")
 	public String updateUserAccount(@PathVariable long id, Model model, Principal principal,
-			@ModelAttribute("person") @Valid AdminUpdateInfoUserDto userDto, BindingResult result, ModelMap map) throws Exception {
+			@ModelAttribute("person") @Valid AdminUpdateInfoUserDto userDto, BindingResult result, ModelMap map)
+			throws Exception {
 
 		if (result.hasErrors()) {
 			map.addAttribute("header", "header_admin");
@@ -184,7 +183,7 @@ public class AdminController {
 			map.addAttribute("footer", "footer_admin");
 			return "/adminChangePassword";
 		}
-		
+
 		String updatedPassword = passwordEncoder.encode(userDto.getPassword());
 		userService.updatePassword(updatedPassword, userDto.getId());
 		userService.loadUserByUsername(userDto.getUserName());
@@ -192,42 +191,45 @@ public class AdminController {
 		url = "redirect:/listUser/edit-user-" + String.valueOf(id) + "/changePassword?success";
 		return url;
 	}
-	
+
 	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/search/{pageNumber}")
-	public String searchUser(HttpServletRequest request, @RequestParam("keyword") String kw, @PathVariable("pageNumber") int pageNumber, Model model, ModelMap map, Principal principal) {
+	public String searchUser(HttpServletRequest request, @RequestParam("keyword") String kw,
+			@PathVariable("pageNumber") int pageNumber, Model model, ModelMap map, Principal principal) {
 		map.addAttribute("header", "header_admin");
 		map.addAttribute("footer", "footer_admin");
 
 		if (kw.equals("")) {
 			return "redirect:/listUser";
 		}
-		
+
 		List<Person> listUserGet = (List<Person>) getList(principal);
 		List<Person> list = new ArrayList<Person>();
-		
+
 		for (Person a : listUserGet) {
-			if (a.getId().toString().equalsIgnoreCase(kw) || a.getUsername().equalsIgnoreCase(kw) || is(a.getFirstname(), kw) || is(a.getLastname(), kw) || is(a.getAddress(), kw))
+			if (a.getId().toString().equalsIgnoreCase(kw) || a.getUsername().equalsIgnoreCase(kw)
+					|| is(a.getFirstname(), kw) || is(a.getLastname(), kw) || is(a.getAddress(), kw))
 				list.add(a);
 		}
-		
+
 		for (Person a : listUserGet) {
 			if (error(a.getFirstname(), kw) || error(a.getLastname(), kw) || error(a.getAddress(), kw))
+				if (!list.contains(a))
 				list.add(a);
 		}
-		
+
 		PagedListHolder<?> pages = (PagedListHolder<?>) request.getSession().getAttribute("listU");
 		int pagesize = 8;
-		
-		//if (pages == null) {
-			pages = new PagedListHolder<>(list);
-			pages.setPageSize(pagesize);
-		
-			final int goToPage = pageNumber - 1;
-			if (goToPage <= pages.getPageCount() && goToPage >= 0) {
-				pages.setPage(goToPage);
-			}
-		
+
+		// if (pages == null) {
+		pages = new PagedListHolder<>(list);
+		pages.setPageSize(pagesize);
+
+		final int goToPage = pageNumber - 1;
+		if (goToPage <= pages.getPageCount() && goToPage >= 0) {
+			pages.setPage(goToPage);
+		}
+
 		request.getSession().setAttribute("listU", pages);
 		int current = pages.getPage() + 1;
 		int begin = Math.max(1, current - list.size());
@@ -244,7 +246,7 @@ public class AdminController {
 
 		return "listUser";
 	}
-	
+
 	// delete user
 	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping(value = { "/delete-user-{id}" })
@@ -268,18 +270,16 @@ public class AdminController {
 
 		return "redirect:/listUser";
 	}
-	
-	boolean is(String a, String b)
-	{
+
+	boolean is(String a, String b) {
 		b.replace("+", " ");
-		return b.contains(a);
+		return b.equalsIgnoreCase(a);
 	}
-	
-	boolean error(String a, String b)
-	{
+
+	boolean error(String a, String b) {
 		String[] arr = b.split("\\+");
-		for (String item : arr) 
-			if (item.contains(a))
+		for (String item : arr)
+			if (a.contains(item))
 				return true;
 		return false;
 	}
