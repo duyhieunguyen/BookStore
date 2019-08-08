@@ -5,54 +5,167 @@
 <title>Book Store</title>
 <meta name="keywords" content="" />
 <meta name="description" content="" />
-<link th:href="@{css/templatemo_style.css}" rel="stylesheet"
+
+<link th:href="@{/css/templatemo_style.css}" rel="stylesheet"
 	type="text/css" />
+
+<link th:href="@{/css/templatemo_style.css}" rel="stylesheet"
+	type="text/css" />
+
+<link th:href="@{/css/listbook.css}" rel="stylesheet" type="text/css" />
+
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <style>
-		tr{
-			font-weight: bold;
-			background-color: #C6C9C4;
-		}
+tr {
+	font-weight: bold;
+	background-color: #C6C9C4;
+}
 </style>
 <title>User's List</title>
 </head>
 <body>
 	<nav th:replace="indexheader :: ${header}"></nav>
+
 	<div id="templatemo_container">
-		<div class="container">
+		<div id="templatemo_content">
+
+			<div id="templatemo_content_left">
+				<div class="templatemo_content_left_section">
+					<h1>Categories</h1>
+					<ul>
+						<li><a href="categorylist">Category</a></li>
+						<li><a href="subpage.html">Proin vulputate justo</a></li>
+						<li><a href="#">In sed risus ac feli</a></li>
+						<li><a href="#">Aliquam tristique dolor</a></li>
+						<li><a href="#">Maece nas metus</a></li>
+						<li><a href="#">Sed pellentesque placerat</a></li>
+						<li><a href="#">Suspen disse</a></li>
+						<li><a href="#">Maece nas metus</a></li>
+						<li><a href="#">In sed risus ac feli</a></li>
+					</ul>
+				</div>
+				<div class="templatemo_content_left_section">
+					<h1>Bestsellers</h1>
+					<ul>
+						<li><a th:href="@{/publishersList}">Publisher</a></li>
+						<li><a href="#">Maece nas metus</a></li>
+						<li><a href="#">In sed risus ac feli</a></li>
+						<li><a href="#">Praesent mattis varius</a></li>
+						<li><a href="#">Maece nas metus</a></li>
+						<li><a href="#">In sed risus ac feli</a></li>
+						<li><a href="#">Flash Templates</a></li>
+						<li><a href="#">CSS Templates</a></li>
+						<li><a href="#">Web Design</a></li>
+						<li><a href="http://www.photovaco.com" target="_parent">Free
+								Photos</a></li>
+					</ul>
+				</div>
+
+				<div class="templatemo_content_left_section">
+					<a href="http://validator.w3.org/check?uri=referer"><img
+						style="border: 0; width: 88px; height: 31px"
+						src="http://www.w3.org/Icons/valid-xhtml10"
+						alt="Valid XHTML 1.0 Transitional" width="88" height="31"
+						vspace="8" border="0" /></a> <a
+						href="http://jigsaw.w3.org/css-validator/check/referer"><img
+						style="border: 0; width: 88px; height: 31px"
+						src="http://jigsaw.w3.org/css-validator/images/vcss-blue"
+						alt="Valid CSS!" vspace="8" border="0" /></a>
+				</div>
+			</div>
+			<!-- end of content left -->
+			<div id="templatemo_content_right">
 				<h1>List User</h1>
-				<a th:href="@{/userList/adminAddUser}">Add New User</a>
-				<table class="table">
-				<thead>
-					<tr>
-						<th> ID </th>
-						<th> USERNAME </th>
-						<th> FIRSTNAME </th>
-						<th> LASTNAME </th>
-						<th> POWER </th>
-						<th> UPDATE </th>
-						<th> DELETE </th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr th:if="${list.empty}">
-						<td colspan="2"> No User Available </td>
-					</tr>
-					<tr th:each="user : ${list}">
-						<td><span th:text="${user.id}">ID</span></td>
-						<td><span th:text="${user.username}">USERNAME</span></td>
-						<td><span th:text="${user.firstname}">FIRSTNAME</span></td>
-						<td><span th:text="${user.lastname}">LASTNAME</span></td>
-						<td><span th:text="${user.power}">POWER</span></td>
-						<td><a th:href="@{'/listUser/edit-user-'+${user.id}}">UPDATE</a></td>
-						<td><a th:href="@{'/listUser/delete-user-'+${user.id}}">DELETE</a></td>
-					</tr>
-				</tbody>
-			</table>
+				<div id="gom">
+					<a th:href="@{/listUser/adminAddUser}"
+						style="font-size: 14pt; margin: 10px 0px 10px 20px; float: left">Add
+						New User</a>
+					<form class="searchUser" th:action="@{/listUser/search/1}"
+						method="get">
+						<div class="form-group">
+							<input type="text" class="form-control" name="keyword" id="key"
+								style="margin: 7px 2px 0px 40px; padding: 15px 100px 3px 15px; border-radius: 5px;"
+								placeholder="Type username, firstname lastname, id..." />
+							<button type="submit" class="btn btn-primary"style="border-radius: 5px; height: 40px; width: 45px;">
+								<img th:src="@{/images/icon_search.png}"
+									style="width: 30px; height: 30px;"></img></button>
+						</div>
+					</form>
+				</div>
+
+				<th:block th:if="${#lists.isEmpty(list.pageList)}">
+					<div class="table">
+					<h1>No User Available</h1>
+					</div>
+				</th:block>
+
+				<th:block th:unless="${#lists.isEmpty(list.pageList)}">
+					<table class="table" align="center">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>USERNAME</th>
+								<th>FIRSTNAME</th>
+								<th>LASTNAME</th>
+								<th>POWER</th>
+								<th>UPDATE</th>
+								<th>DELETE</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="user : ${list.pageList}">
+								<td><span th:text="${user.id}" th:title="${user.id}">ID</span></td>
+								<td><span th:text="${user.username}"
+									th:title="${user.username}">USERNAME</span></td>
+								<td><span th:text="${user.firstname}"
+									th:title="${user.firstname}">FIRSTNAME</span></td>
+								<td><span th:text="${user.lastname}"
+									th:title="${user.lastname}">LASTNAME</span></td>
+								<td><span th:text="${user.power}" th:title="${user.power}">POWER</span></td>
+								<td><a th:href="@{'/listUser/edit-user-'+${user.id}}">UPDATE</a></td>
+								<td><a th:href="@{'/listUser/delete-user-'+${user.id}}">DELETE</a></td>
+							</tr>
+						</tbody>
+					</table>
+					<ul class="pagination">
+						<li
+							th:class="${currentIndex == 1}? 'page-item disabled' : 'page-item'">
+							<a class="page-link" th:href="@{|${baseUrl}1|}">First</a>
+						</li>
+						<li
+							th:class="${currentIndex == 1}? 'page-item disabled': 'page-item' ">
+							<a class="page-link" aria-label="Previous"
+							th:href="@{|${baseUrl}${currentIndex - 1}|}"
+							title='Go to previous page'><span aria-hidden="true">«</span>
+								<span class="sr-only"></span></a>
+						</li>
+						<li th:each="item : ${#numbers.sequence(beginIndex, endIndex)}"
+							th:class="${item == currentIndex ? 'page-item active' :'page-item' }">
+							<a class="page-link" th:href="@{|${baseUrl}${item}|}"> <span
+								th:text='${item}'>1</span>
+						</a>
+						</li>
+						<li
+							th:class="${currentIndex == totalPageCount}? 'page-item disabled': 'page-item'">
+							<a class="page-link" aria-label="Next"
+							th:href="@{|${baseUrl}${currentIndex + 1}|}"
+							title='Go to next page'><span aria-hidden="true">»</span> <span
+								class="sr-only"></span></a>
+						</li>
+						<li
+							th:class="${currentIndex == totalPageCount}? 'page-item disabled':'page-item'">
+							<a class="page-link" th:href="@{|${baseUrl}${totalPageCount}|}">Last</a>
+						</li>
+					</ul>
+				</th:block>
+			</div>
+			<div class="cleaner_with_height"></div>
 		</div>
-		</div>
-		<footer th:replace="indexheader :: ${footer}"></footer>
+	</div>
+	<!-- end of content right -->
+	<footer th:replace="indexheader :: ${footer}"></footer>
 </body>
 </html>

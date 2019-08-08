@@ -24,7 +24,7 @@ import pq.jdev.b001.bookstore.users.web.dto.AdminDto;
 
 @Controller
 @PreAuthorize("hasRole('ADMIN')")
-@RequestMapping("/userList/adminAddUser")
+@RequestMapping("/listUser/adminAddUser")
 public class AdminAddUserController {
 
 	@Autowired
@@ -74,7 +74,7 @@ public class AdminAddUserController {
 
 	@PostMapping
 	public String registerUserAccount(@ModelAttribute("person") @Valid AdminDto userDto,
-			BindingResult result) {
+			BindingResult result, ModelMap map) {
 		
 		Person existingUserName = userService.findByUsername(userDto.getUserName());
 		Person existingEmail = userService.findByEmail(userDto.getEmail());
@@ -83,10 +83,12 @@ public class AdminAddUserController {
 		}
 
 		if (result.hasErrors()) {
+			map.addAttribute("header", "header_admin");
+			map.addAttribute("footer", "footer_admin");
 			return "adminAddUser";
 		}
 		
 		userService.save(userDto);
-		return "redirect:/userList/adminAddUser?success";
+		return "redirect:/listUser/adminAddUser?success";
 	}
 }

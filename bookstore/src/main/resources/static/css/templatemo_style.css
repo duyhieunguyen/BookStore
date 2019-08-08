@@ -221,7 +221,9 @@ img {
 #templatemo_content #templatemo_content_right {
 	float: right;
 	width: 740px;
+	height:505px;
 	padding: 0px 0px 0px 0px;
+	background-color: #171716;
 }
 
 #templatemo_content_left .templatemo_content_left_section {
@@ -269,11 +271,12 @@ img {
 }
 
 #templatemo_content_right h1 {
+	text-align: center;
 	padding: 10px;
 	margin: 0 0 20px 0;
-	font-size: 15px;
+	font-size: 30px;
 	color: #cbc750;
-	background: url("../images/templatemo_h1_bg.jpg");
+	background: #171716;
 }
 
 #templatemo_content_right h2 {
@@ -372,6 +375,8 @@ img {
 	color: red;
 }
 
+
+
 .search .container_right{
 	text-align : center;
 	width: 740px;
@@ -382,12 +387,41 @@ th {
 	color : red;
 }
 
-.container .table {
+#templatemo_content_right .table {
 	height: 100px;
-  	width: 100%;
+  	width: 740px;
+  	color: black;
+  	
+  	border-collapse: collapse;
+  	overflow: hidden;
 }
 
-.container .table a{
+#templatemo_content_right .table thead tr th{
+	color: red;
+	text-align: center;
+	font-weight: bold;
+	background-color: #C6C9C4;
+	padding: 10px 10px 10px 15px;
+	border: 2px solid white;
+}
+
+#templatemo_content_right .table tbody tr td{
+	color: black;
+	max-width: 130px;
+	font-weight: bold;
+	padding: 10px 10px 10px 15px;
+	border: 2px solid white;
+}
+
+#templatemo_content_right .table tbody tr td span{
+	text-align: left;
+	display: block;
+  	overflow: hidden;
+  	text-overflow: ellipsis;
+}
+
+#templatemo_content_right .table a{
+	text-align:center;
 	color: #FD560F;
 }
 
@@ -420,15 +454,24 @@ th {
 	font-family: Verdana, Arial, san-serif;
 	font-size: 30px;
 	color: red;
+	width: 440px;
 }
 
 .container .regis .form-group {
 	font-size: 20px;
  	padding: 0px 0px 0px 100px;
  	color: red;
+
 }
 
-.container .regis .form-group #gg {
+
+
+.container .regis .form-group input{
+	
+}
+
+.container .regis .form-group
+ #gg {
 	font-family: Verdana, Arial, san-serif;
 	font-size: 20px;
 	padding: 0px 0px 0px 100px;
@@ -460,7 +503,7 @@ th {
 .container h1{
 	color: red;
 	text-align: center;
-	width: 920px;
+	width: 448px;
 	background: #1C1C1C;
 }
 
@@ -476,4 +519,18 @@ th {
 	text-align: center;
 	width: 960px;
 	background: #1C1C1C;
+}
+
+#templatemo_content_right #gom .searchUser{
+	margin: -20px 10px 10px 0px;
+	padding: 0px 10px 10px 0px;
+	float: right;
+}
+
+#templatemo_content_right #gom .searchUser .form-group input {
+	width: 280px;
+}
+
+#templatemo_content_right #gom .searchUser .form-group input::-webkit-input-placeholder { 
+	color: red;
 }
