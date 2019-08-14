@@ -1,39 +1,73 @@
-<!DOCTYPE html
-    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Book Store</title>
-<meta name="keywords" content="" />
+  <link rel="stylesheet" href="style.css" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="keywords" content="" />
 <meta name="description" content="" />
-
-<link rel="stylesheet" type="text/css"
-	th:href="@{/webjars/bootstrap/3.3.7/css/bootstrap.min.css}" />
-
+<title>Add Category</title>
 <link th:href="@{/css/templatemo_style.css}" rel="stylesheet"
 	type="text/css" />
+<link th:href="@{/css/category.css}" rel="stylesheet" type="text/css" />
+  <style>
+  
+    input[type=text] {
+      border: 0;
+      width: 200px;
+      padding: 12px 10px;
+      background: none;
+      color: yellow;
+      margin: 20px 10;
+      display: block;
+      border: 2px solid rgb(42, 206, 51);
+      border-radius: 24px;
+      outline: none;
+      transition: 0.25s;
+    }
 
-<link th:href="@{/css/listbook.css}" rel="stylesheet" type="text/css" />
-<style>
-.menu {
-	margin: 20px 0px 0px 0px;
-}
+    input[type=text]:focus {
+      width: 280px;
+      border-color: rgb(32, 236, 209);
+    }
 
-}
-</style>
+    button {
+      background-color: white;
+      /* Green */
+      border: 2px solid #4caf50;
+      color: black;
+      padding: 16px 24px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 4px 2px;
+      -webkit-transition-duration: 0.4s;
+      /* Safari */
+      transition-duration: 0.4s;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #4caf50;
+      color: white;
+    }
+  </style>
 </head>
 
 <body>
-	<nav th:replace="indexheader :: ${header}"></nav>
+
+<nav th:replace="indexheader :: ${header}"></nav>
 	<div id="templatemo_container">
 		<div id="templatemo_content">
+
 			<div id="templatemo_content_left">
 				<div class="templatemo_content_left_section">
 					<h1>Categories</h1>
 					<ul>
 						<li><a th:href="@{/categorylist}">Category</a></li>
-						<li><a th:href="subpage.html">Proin vulputate justo</a></li>
+						<li><a href="subpage.html">Proin vulputate justo</a></li>
 						<li><a href="#">In sed risus ac feli</a></li>
 						<li><a href="#">Aliquam tristique dolor</a></li>
 						<li><a href="#">Maece nas metus</a></li>
@@ -59,6 +93,7 @@
 								Photos</a></li>
 					</ul>
 				</div>
+
 				<div class="templatemo_content_left_section">
 					<a href="http://validator.w3.org/check?uri=referer"><img
 						style="border: 0; width: 88px; height: 31px"
@@ -71,30 +106,21 @@
 						alt="Valid CSS!" vspace="8" border="0" /></a>
 				</div>
 			</div>
-			<div id="templatemo_content_right">
-				<div class="cleaner_with_height">&nbsp;</div>
-				<div class="gom">
-					<form class="searchbar" th:action="@{/search/1}" method="get">
-						<div class="form-group searchs">
-							<input type="text" class="form-control" name="s"
-								placeholder="Search type book..."
-								style="margin: -10px 0px -3px -75px; padding: 0px 42px 0px 20px;" />
-							<button type="submit" class="btn btn-primary"
-								style="margin: -45px 0px 0px 77px; margin: -35px 10px 1px 130px;">
-								<img th:src="@{/images/icon_search.png}"
-									style="width: 30px; height: 30px;">
-							</button>
-						</div>
-					</form>
-				</div>
-				<div class="cleaner_with_height">&nbsp;</div>
-				<nav th:replace="listbook :: menubook"></nav>
-			</div>
-			<div class="cleaner_with_height">&nbsp;</div>
-		</div>
-		<!-- end of content -->
+			<!-- end of content left -->
+			
+		<div id="templatemo_content_right">
+  <form th:action="@{/addition}" th:object="${category}" method="post" >
+    <div>
+      <label for="name">Category Name</label>
+      <input type="text" id="categoryName" name="name" placeholder="new category..." required />
+    </div>
+    <button type="submit" id="add">ADD</button>
+  </form>
+  </div>
+  <div class="cleaner_with_height">&nbsp;</div>
 	</div>
-
+	<!-- end of content -->
+	
 	<footer th:replace="indexheader :: ${footer}"></footer>
 </body>
 
