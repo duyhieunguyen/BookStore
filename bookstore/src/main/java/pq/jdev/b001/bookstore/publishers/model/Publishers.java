@@ -1,4 +1,4 @@
-package pq.jdev.b001.bookstore.publisher.models;
+package pq.jdev.b001.bookstore.publishers.model;
 
 import java.util.Set;
 
