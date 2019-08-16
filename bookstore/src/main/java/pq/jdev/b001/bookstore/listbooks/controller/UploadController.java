@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Controller;
@@ -19,17 +18,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import pq.jdev.b001.bookstore.users.service.UserService;
-
 @Controller
 
 public class UploadController {
 
-	@Autowired
-	private UserService userService;
-
 	// Save the uploaded file to this folder
-	private static String UPLOADED_FOLDER = "C:/Users/duyhi/Desktop/booktest/bookstore/src/main/resources/static/images/";
+	private static String UPLOADED_FOLDER = "C:/Users/laptop/Desktop/bookstore/src/main/resources/static/images/";
 
 	@GetMapping("/upload")
 	public String viewUpLoad(Authentication authentication, ModelMap map) {
