@@ -1,16 +1,15 @@
-<!DOCTYPE html
-    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Book Store</title>
-<meta name="keywords" content="" />
-<meta name="description" content="" />
+
+
+<link rel="stylesheet" type="text/css"
+	th:href="@{/webjars/bootstrap/3.3.7/css/bootstrap.min.css}" />
+
 <link th:href="@{/css/templatemo_style.css}" rel="stylesheet"
 	type="text/css" />
+<link th:href="@{/css/publisher.css}" rel="stylesheet" type="text/css" />
 </head>
-
 <body>
 
 	<nav th:replace="indexheader :: ${header}"></nav>
@@ -36,7 +35,6 @@
 					<h1>Bestsellers</h1>
 					<ul>
 						<li><a th:href="@{/publishersList}">Publisher</a></li>
-						<li><a href="#">Vestibulum ullamcorper</a></li>
 						<li><a href="#">Maece nas metus</a></li>
 						<li><a href="#">In sed risus ac feli</a></li>
 						<li><a href="#">Praesent mattis varius</a></li>
@@ -63,58 +61,45 @@
 				</div>
 			</div>
 			<!-- end of content left -->
-<!-- 			<div class="row">
-				<a th:href="@{/employee/create}" class="btn btn-success pull-left">
-					<span class="glyphicon glyphicon-plus"></span> Add new employee
-				</a>
-				<form class="form-inline pull-right" action="#"
-					th:action="@{/employee/search}" >
-					<div class="form-group">
-						<input type="text" class="form-control" name="s"
-							placeholder="Type employee name..." />
-					</div>
-					<button type="submit" class="btn btn-primary">Search</button>
-				</form>
-			</div> -->
-			
-			<form th:action="@{/publishersList}" th:object="${category}"
-				method="get">
-				<p class="my-5">
-					<a th:href="@{/publisher/add}" class="btn"><i> Add Publisher</i></a>
-				</p>
-				<div>
-					<table class="content-table" align="center">
-						<thead>
-							<tr>
-								<th>ID</th>
-								<th>PUBLISHINGHOUSE</th>
-								<th>CREATEDNAME</th>
-								<th>CREATEDDATE</th>
-								<th>UPLOADNAME</th>
-								<th>UPDATEDATE</th>
-								<th>Delete</th>
-							</tr>
-						</thead>
-						<tbody>
-							<td th:utext="${publisher.id}">ID</td>
-							<td th:utext="${publisher.publisher}">Publisher</td>
-							<td th:utext="${publisher.createName}">CreateName</td>
-							<td th:utext="${publisher.createDate}">CrateDate</td>
-							<td th:utext="${publisher.updateName}">UploadName</td>
-							<td th:utext="${publisher.updateDate}">UploadDate</td>
-							<td><a
-								th:href="@{/publisher/{id}/delete(id=${publisher.id})}"
-								class="btn btn-primary"><i class="fas fa-user-times ml-2"></i>delete</a></td>
-						</tbody>
-					</table>
-				</div>
-			</form>
 
-			<!-- end of content right -->
+			<div id="templatemo_content_right">
+				<form action="#" th:action="@{/publisher/save}"
+					th:object="${publisher}" method="POST"
+					style="width: 550px; margin: -25px 0px 0px 70px;">
+					<input type="hidden" value="${publisher.id}" th:field="*{id}" />
+					<div class="form-group" style="margin: 35px 0px 0px 50px;">
+						<label class="font">PUBLISHINGHOUSE: </label> <input type="text"
+							value="${publisher.publisher}" class="form-control"
+							th:field="*{publisher}" />
+					</div>
+					<div class="form-group" style="margin: 35px 0px 0px 50px;">
+						<label class="font">CREATEDATE: </label> <input type="date"
+							value="${publisher.createDate}" class="form-control"
+							th:field="*{createDate}" />
+					</div>
+					<div class="form-group" style="margin: 35px 0px 0px 50px;">
+						<label class="font">CRATENAME: </label> <input type="text"
+							value="${publisher.createName}" class="form-control"
+							th:field="*{createName}" />
+					</div>
+					<div class="form-group" style="margin: 35px 0px 0px 50px;">
+						<label class="font">UPLOADNAME: </label> <input type="text"
+							value="${publisher.updateName}" class="form-control"
+							th:field="*{updateName}" />
+					</div>
+					<div class="form-group" style="margin: 35px 0px 0px 50px;">
+						<label class="font">UPDATEDATE: </label> <input type="date"
+							value="${publisher.updateDate}" class="form-control"
+							th:field="*{updateDate}" />
+					</div>
+					<button type="submit" class="btn btn-primary"
+						style="margin: 20px 0px 0px 270px;">Save</button>
+				</form>
+			</div>
 			<div class="cleaner_with_height">&nbsp;</div>
 		</div>
 		<!-- end of content -->
-	</div>
-	<footer th:replace="indexheader :: ${footer}"></footer>
+
+		<footer th:replace="indexheader :: ${footer}"></footer>
 </body>
 </html>

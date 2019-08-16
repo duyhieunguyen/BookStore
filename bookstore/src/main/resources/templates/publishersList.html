@@ -25,9 +25,9 @@
 	crossorigin="anonymous">
 <!-- <link rel="stylesheet" href="../css/shards.min.css"> -->
 
-<link th:href="@{css/templatemo_style.css}" rel="stylesheet"
+<link th:href="@{/css/templatemo_style.css}" rel="stylesheet"
 	type="text/css" />
-<link th:href="@{css/publisher.css}" rel="stylesheet" type="text/css" />
+<link th:href="@{/css/publisher.css}" rel="stylesheet" type="text/css" />
 </head>
 
 <body>
@@ -95,10 +95,10 @@
 				</form>
 			</div> -->
 			<div id="templatemo_content_right">
-				<form th:action="@{/publishersList}" th:object="${category}"
+				<form th:action="@{/publishersList}" th:object="${publisher}"
 					method="get">
 					<p class="my-5">
-						<a href="" class="btn"><i> Add Publisher</i></a>
+						<a th:href="@{/publisher/add}" class="btn"><i> Add Publisher</i></a>
 					</p>
 					<div>
 						<table class="content-table" align="center">
@@ -133,7 +133,7 @@
 										function myFunction() {
 											var txt;
 											if (confirm("ban co chac muon xoa !")) {
-												th: href = "@{/publisher/{id}/delete(id=${publisher.id})}"
+												th:href = "@{/publisher/{id}/delete(id=${publisher.id})}"
 											} else {
 												return "publishersList";
 											}
@@ -143,6 +143,8 @@
 							</tbody>
 						</table>
 					</div>
+					
+					
 				</form>
 			</div>
 			<!-- end of content right -->

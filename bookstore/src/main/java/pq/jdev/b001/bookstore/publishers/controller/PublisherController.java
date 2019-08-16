@@ -1,6 +1,7 @@
 package pq.jdev.b001.bookstore.publishers.controller;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 //import java.util.concurrent.Flow.Publisher;
 
@@ -9,6 +10,8 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.support.PagedListHolder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -20,9 +23,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import pq.jdev.b001.bookstore.publisher.models.Publishers;
 import pq.jdev.b001.bookstore.publishers.service.PublisherService;
+import pq.jdev.b001.bookstore.users.service.UserService;
 
 @Controller
 public class PublisherController {
+	
+	@Autowired
+	private UserService userService;
 	// private final PublisherRepository publisherReponsitory;
 
 	/*
@@ -56,20 +63,69 @@ public class PublisherController {
 		model.addAttribute("publishers", publishers);
 		return "publishersList";
 	}
-
+	
+	@GetMapping("/publisher/add")
+	public String create(Model model,ModelMap map, Authentication authentication) {
+		if (authentication != null) {
+			Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+			List<String> roles = new ArrayList<String>();
+			for (GrantedAuthority a : authorities) {
+				roles.add(a.getAuthority());
+			}
+			
+			if (isAdmin(roles)) {
+				map.addAttribute("header", "header_admin");
+				map.addAttribute("footer", "footer_admin");
+			}
+			else if (isUser(roles)){
+				map.addAttribute("header", "header_user");
+				map.addAttribute("footer", "footer_user");
+			} 
+		}
+		else {
+				map.addAttribute("header", "header_login");
+				map.addAttribute("footer", "footer_login");
+		}
+		model.addAttribute("publisher", new Publishers());
+		return "publisherAdd";
+	}
+	
 	public String viewDetail(Model model) {
 		
 		return "detailPublishers";
 	}
 
 	@GetMapping("/publisher/{id}/delete")
-	public String delete(@PathVariable int id, RedirectAttributes redirect) {
+	public String delete(@PathVariable int id, RedirectAttributes redirect, Authentication authentication, ModelMap map) {
 		publisherService.delete(id);
 		return "redirect:/publishersList";
 	}
 	
 	@GetMapping("/publisher/{id}/edit")
-	public String edit(@PathVariable int id, Model model) {
+	public String edit(@PathVariable int id, Model model, Authentication authentication, ModelMap map) {
+		
+		if (authentication != null) {
+			Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+			List<String> roles = new ArrayList<String>();
+			for (GrantedAuthority a : authorities) {
+				roles.add(a.getAuthority());
+			}
+			
+			if (isAdmin(roles)) {
+				map.addAttribute("header", "header_admin");
+				map.addAttribute("footer", "footer_admin");
+			}
+			else if (isUser(roles)){
+				map.addAttribute("header", "header_user");
+				map.addAttribute("footer", "footer_user");
+			} 
+		}
+		else {
+				map.addAttribute("header", "header_login");
+				map.addAttribute("footer", "footer_login");
+				return "redirect:/";
+		}
+		
 		model.addAttribute("publisher", publisherService.find(id));
 		return "detailPublishers";
 	}
@@ -77,12 +133,21 @@ public class PublisherController {
 	@PostMapping("/publisher/save")
 	public String save(@Valid Publishers publishers, BindingResult result, RedirectAttributes redirect) {
 		if (result.hasErrors()) {
-			return "detailPublishers";
+			return "publisherAdd";
 			}
 		publisherService.save(publishers);
 		return "redirect:/publishersList";
 		}
 	
+
+	
+	@GetMapping("publisherAdd")
+	public String addPublisher(Model model, ModelMap map)
+	{
+		map.addAttribute("header", "header_admin");
+		map.addAttribute("footer", "footer_admin");
+		return "publisherAdd";
+	}
 	/*
 	 * @GetMapping("/publisher/search") public String search(@RequestParam("s")
 	 * String s, Model model) { if (s.equals("")) { return
@@ -122,6 +187,20 @@ public class PublisherController {
 		model.addAttribute("totalPageCount", totalPageCount);
 		model.addAttribute("baseUrl", baseUrl);
 		return "publiserList";
+	}
+	
+	private boolean isUser(List<String> roles) {
+		if (roles.contains("ROLE_EMPLOYEE")) {
+			return true;
+		}
+		return false;
+	}
+
+	private boolean isAdmin(List<String> roles) {
+		if (roles.contains("ROLE_ADMIN")) {
+			return true;
+		}
+		return false;
 	}
 
 }
