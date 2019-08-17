@@ -1,9 +1,11 @@
 package pq.jdev.b001.bookstore.listbooks.controller;
 
 import java.security.Principal;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -25,7 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import pq.jdev.b001.bookstore.category.model.Category;
-import pq.jdev.b001.bookstore.category.service.CategoryAddEditService;
+import pq.jdev.b001.bookstore.category.service.CategoryService;
 import pq.jdev.b001.bookstore.books.model.Book;
 import pq.jdev.b001.bookstore.listbooks.service.ListBookService;
 import pq.jdev.b001.bookstore.publishers.model.Publishers;
@@ -45,7 +47,7 @@ public class ListBookController {
 	private PublisherService publisherService;
 
 	@Autowired
-	private CategoryAddEditService categoryservice;
+	private CategoryService categoryservice;
 
 	@GetMapping("/book")
 	public String index(Authentication authentication, ModelMap map, Model model, HttpServletRequest request,
@@ -365,13 +367,14 @@ public class ListBookController {
 		List<Book> list = new ArrayList<Book>();
 
 		for (Book a : listBookGet) {
-			if (String.valueOf(a.getId()).equalsIgnoreCase(s) || a.getTitle().equalsIgnoreCase(s)
-					|| is(a.getDomain(), s) || is(a.getAuthors(), s))
+			if (is(String.valueOf(a.getId()), s) || is(a.getTitle(), s) || is(a.getDomain(), s)
+					|| is(a.getAuthors(), s) || is(publisherService.findOne(a.getPublisher().getId()).getPublisher(), s))
 				list.add(a);
 		}
 
 		for (Book a : listBookGet) {
-			if (error(a.getTitle(), s) || error(a.getDomain(), s) || error(a.getAuthors(), s))
+			if (error(String.valueOf(a.getId()), s) || error(a.getTitle(), s) || error(a.getDomain(), s)
+					|| error(a.getAuthors(), s) || error(publisherService.find(a.getPublisher().getId()).getPublisher(),s))
 				if (!list.contains(a))
 					list.add(a);
 		}
@@ -435,15 +438,35 @@ public class ListBookController {
 	}
 
 	boolean is(String a, String b) {
+		a = unAccent(a);
+		b = unAccent(b);
 		b.replace("+", " ");
+		b.replace("%20", " ");
+		b = b.toLowerCase();
+		a = a.toLowerCase();
 		return b.equalsIgnoreCase(a);
 	}
-	
+
 	boolean error(String a, String b) {
+		a = unAccent(a);
+		b = unAccent(b);
+		System.out.println(a);
+		System.out.println(b);
+		b.replace("%20", "+");
+		b = b.toLowerCase();
+		a = a.toLowerCase();
 		String[] arr = b.split("\\+");
+		System.out.println(a);
+		System.out.println(arr.toString());
 		for (String item : arr)
 			if (a.contains(item))
 				return true;
 		return false;
+	}
+
+	public static String unAccent(String s) {
+		String temp = Normalizer.normalize(s, Normalizer.Form.NFD);
+		Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+		return pattern.matcher(temp).replaceAll("").replaceAll("Đ", "D").replace("đ", "d");
 	}
 }
