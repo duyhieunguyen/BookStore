@@ -26,9 +26,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import pq.jdev.b001.bookstore.books.model.Book;
+import pq.jdev.b001.bookstore.books.service.UploadPathService;
 import pq.jdev.b001.bookstore.category.model.Category;
 import pq.jdev.b001.bookstore.category.service.CategoryService;
-import pq.jdev.b001.bookstore.books.model.Book;
 import pq.jdev.b001.bookstore.listbooks.service.ListBookService;
 import pq.jdev.b001.bookstore.publishers.model.Publishers;
 import pq.jdev.b001.bookstore.publishers.service.PublisherService;
@@ -39,15 +40,18 @@ import pq.jdev.b001.bookstore.users.service.UserService;
 public class ListBookController {
 	@Autowired
 	private ListBookService listBookService;
-	
+
 	@Autowired
 	private UserService userService;
-	
+
 	@Autowired
 	private PublisherService publisherService;
 
 	@Autowired
 	private CategoryService categoryservice;
+
+	@Autowired
+	private UploadPathService uploadPathService;
 
 	@GetMapping("/book")
 	public String index(Authentication authentication, ModelMap map, Model model, HttpServletRequest request,
@@ -70,10 +74,10 @@ public class ListBookController {
 			map.addAttribute("header", "header_login");
 			map.addAttribute("footer", "footer_login");
 		}
-		
+
 		PagedListHolder<?> pages = null;
 
-		int pagesize = 4;
+		int pagesize = 6;
 		List<Book> listH = null;
 		if (principal == null) {
 			listH = (List<Book>) listBookService.findAll();
@@ -85,17 +89,17 @@ public class ListBookController {
 		if (pages == null) {
 			pages = new PagedListHolder<>(listH);
 			pages.setPageSize(pagesize);
-		} 
-		
+		}
+
 		if (principal == null)
 			request.getSession().setAttribute("bookListCC", pages);
 		else
 			request.getSession().setAttribute("bookListCR", pages);
-		
+
 		if (model.asMap().get("success") != null)
 			redirect.addFlashAttribute("success", model.asMap().get("success").toString());
-		
-		int pagesizeCP = 10;
+
+		int pagesizeCP = 15;
 		PagedListHolder<?> pagePubs = null;
 		PagedListHolder<?> pageCates = null;
 		List<Publishers> listPub = (List<Publishers>) publisherService.findAll();
@@ -107,7 +111,7 @@ public class ListBookController {
 		if (pagePubs == null) {
 			pagePubs = new PagedListHolder<>(listPub);
 			pagePubs.setPageSize(pagesizeCP);
-		} 
+		}
 		model.addAttribute("publishers", pagePubs);
 		model.addAttribute("categories", pageCates);
 		return "redirect:/book/page/1";
@@ -124,7 +128,7 @@ public class ListBookController {
 			b.setOk(0);
 			if (b.getPerson().getId() == id)
 				b.setOk(1);
-			
+
 			newList.add(b);
 		}
 		return newList;
@@ -140,7 +144,7 @@ public class ListBookController {
 			for (GrantedAuthority a : authorities) {
 				roles.add(a.getAuthority());
 			}
-			
+
 			if (isUser(roles)) {
 				map.addAttribute("header", "header_user");
 				map.addAttribute("footer", "footer_user");
@@ -155,9 +159,9 @@ public class ListBookController {
 			map.addAttribute("footer", "footer_login");
 			map.addAttribute("ok", "FALSE");
 		}
-		
+
 		PagedListHolder<?> pages = null;
-		int pagesize = 4;
+		int pagesize = 6;
 		List<Book> list = null;
 		if (principal == null) {
 			list = (List<Book>) listBookService.findAll();
@@ -193,8 +197,8 @@ public class ListBookController {
 		model.addAttribute("totalPageCount", totalPageCount);
 		model.addAttribute("baseUrl", baseUrl);
 		model.addAttribute("books", pages);
-		
-		int pagesizeCP = 10;
+
+		int pagesizeCP = 15;
 		PagedListHolder<?> pagePubs = null;
 		PagedListHolder<?> pageCates = null;
 		List<Publishers> listPub = (List<Publishers>) publisherService.findAll();
@@ -206,10 +210,10 @@ public class ListBookController {
 		if (pagePubs == null) {
 			pagePubs = new PagedListHolder<>(listPub);
 			pagePubs.setPageSize(pagesizeCP);
-		} 
+		}
 		model.addAttribute("publishers", pagePubs);
 		model.addAttribute("categories", pageCates);
-		
+
 		return "listbook";
 	}
 
@@ -230,7 +234,7 @@ public class ListBookController {
 				map.addAttribute("footer", "footer_admin");
 			}
 		}
-		int pagesizeCP = 10;
+		int pagesizeCP = 15;
 		PagedListHolder<?> pagePubs = null;
 		PagedListHolder<?> pageCates = null;
 		List<Publishers> listPub = (List<Publishers>) publisherService.findAll();
@@ -242,42 +246,40 @@ public class ListBookController {
 		if (pagePubs == null) {
 			pagePubs = new PagedListHolder<>(listPub);
 			pagePubs.setPageSize(pagesizeCP);
-		} 
+		}
 		model.addAttribute("publishers", pagePubs);
 		model.addAttribute("categories", pageCates);
 		model.addAttribute("book", new Book());
-		
+
 		return "savebook";
 	}
 
 	@GetMapping("/book/{id}/edit")
-	public String edit(@PathVariable int id, Model model, ModelMap map, Authentication authentication) {
+	public String edit(@PathVariable Long id, Model model, ModelMap map, Authentication authentication) {
 		if (authentication != null) {
 			Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
 			List<String> roles = new ArrayList<String>();
 			for (GrantedAuthority a : authorities) {
 				roles.add(a.getAuthority());
 			}
-			
+
 			if (isAdmin(roles)) {
 				map.addAttribute("header", "header_admin");
 				map.addAttribute("footer", "footer_admin");
-			}
-			else if (isUser(roles)){
+			} else if (isUser(roles)) {
 				Long personId = userService.findByUsername(authentication.getName()).getId();
 				Long personIdInBook = listBookService.findOne(id).getPerson().getId();
 				if (personIdInBook != personId)
 					return "redirect:/";
 				map.addAttribute("header", "header_user");
 				map.addAttribute("footer", "footer_user");
-			} 
+			}
+		} else {
+			map.addAttribute("header", "header_login");
+			map.addAttribute("footer", "footer_login");
+			return "redirect:/";
 		}
-		else {
-				map.addAttribute("header", "header_login");
-				map.addAttribute("footer", "footer_login");
-				return "redirect:/";
-		}
-		int pagesizeCP = 10;
+		int pagesizeCP = 15;
 		PagedListHolder<?> pagePubs = null;
 		PagedListHolder<?> pageCates = null;
 		List<Publishers> listPub = (List<Publishers>) publisherService.findAll();
@@ -289,7 +291,8 @@ public class ListBookController {
 		if (pagePubs == null) {
 			pagePubs = new PagedListHolder<>(listPub);
 			pagePubs.setPageSize(pagesizeCP);
-		} 
+		}
+		
 		model.addAttribute("publishers", pagePubs);
 		model.addAttribute("categories", pageCates);
 		model.addAttribute("book", listBookService.findOne(id));
@@ -297,13 +300,14 @@ public class ListBookController {
 	}
 
 	@PostMapping("/book/save")
-	public String save(@Valid Book book, BindingResult result, RedirectAttributes redirect, ModelMap map, Principal principal) {
+	public String save(@Valid Book book, BindingResult result, RedirectAttributes redirect, ModelMap map,
+			Principal principal) {
 		if (result.hasErrors()) {
 			map.addAttribute("header", "header_admin");
 			map.addAttribute("footer", "footer_admin");
 			return "savebook";
 		}
-		
+
 		if (book.getPerson() == null)
 			book.setPerson(userService.findByUsername(principal.getName()));
 		listBookService.save(book);
@@ -311,11 +315,20 @@ public class ListBookController {
 		return "redirect:/book";
 	}
 
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
 	@GetMapping("/book/{id}/delete")
-	public String delete(@PathVariable int id, RedirectAttributes redirect) {
-		listBookService.delete(id);
-		redirect.addFlashAttribute("success", "Deleted book successfully!");
+	public String delete(@PathVariable Long id, RedirectAttributes redirect, Authentication authentication) {
+		Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+		List<String> roles = new ArrayList<String>();
+		for (GrantedAuthority a : authorities) {
+			roles.add(a.getAuthority());
+		}
+		if ((authentication != null) && ((userService.findByUsername(authentication.getName())
+				.getId() == listBookService.findOne(id).getPerson().getId()) || (isAdmin(roles)))) {
+			uploadPathService.deleteAllUploadByIdBook(id);
+			listBookService.delete(id);
+			redirect.addFlashAttribute("success", "Deleted book successfully!");
+		}
 		return "redirect:/book";
 	}
 
@@ -354,8 +367,8 @@ public class ListBookController {
 //		}
 
 		PagedListHolder<?> pages = null;
-		int pagesize = 4;
-		
+		int pagesize = 6;
+
 		List<Book> listBookGet = null;
 		if (principal == null) {
 			listBookGet = (List<Book>) listBookService.findAll();
@@ -363,18 +376,19 @@ public class ListBookController {
 			Person per = userService.findByUsername(principal.getName());
 			listBookGet = getList(per);
 		}
-		
+
 		List<Book> list = new ArrayList<Book>();
 
 		for (Book a : listBookGet) {
-			if (is(String.valueOf(a.getId()), s) || is(a.getTitle(), s) || is(a.getDomain(), s)
-					|| is(a.getAuthors(), s) || is(publisherService.findOne(a.getPublisher().getId()).getPublisher(), s))
+			if (is(String.valueOf(a.getId()), s) || is(a.getTitle(), s) || is(a.getDomain(), s) || is(a.getAuthors(), s)
+					|| is(publisherService.findOne(a.getPublisher().getId()).getPublisher(), s))
 				list.add(a);
 		}
 
 		for (Book a : listBookGet) {
 			if (error(String.valueOf(a.getId()), s) || error(a.getTitle(), s) || error(a.getDomain(), s)
-					|| error(a.getAuthors(), s) || error(publisherService.find(a.getPublisher().getId()).getPublisher(),s))
+					|| error(a.getAuthors(), s)
+					|| error(publisherService.find(a.getPublisher().getId()).getPublisher(), s))
 				if (!list.contains(a))
 					list.add(a);
 		}
@@ -403,8 +417,8 @@ public class ListBookController {
 		model.addAttribute("totalPageCount", totalPageCount);
 		model.addAttribute("baseUrl", baseUrl);
 		model.addAttribute("books", pages);
-		
-		int pagesizeCP = 10;
+
+		int pagesizeCP = 15;
 		PagedListHolder<?> pagePubs = null;
 		PagedListHolder<?> pageCates = null;
 		List<Publishers> listPub = (List<Publishers>) publisherService.findAll();
@@ -416,10 +430,10 @@ public class ListBookController {
 		if (pagePubs == null) {
 			pagePubs = new PagedListHolder<>(listPub);
 			pagePubs.setPageSize(pagesizeCP);
-		} 
+		}
 		model.addAttribute("publishers", pagePubs);
 		model.addAttribute("categories", pageCates);
-		
+
 		return "listbook";
 	}
 

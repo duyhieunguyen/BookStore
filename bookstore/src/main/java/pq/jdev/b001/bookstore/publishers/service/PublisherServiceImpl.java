@@ -4,55 +4,50 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import pq.jdev.b001.bookstore.publishers.model.Publishers;
 import pq.jdev.b001.bookstore.publishers.repository.PublisherRepository;
 
 @Service("publisherService")
+@Transactional
 public class PublisherServiceImpl implements PublisherService {
 	@Autowired
 	PublisherRepository publisherRepository;
 
 	@Override
 	public List<Publishers> findAll() {
-		// TODO Auto-generated method stub
 		return (List<Publishers>) publisherRepository.findAll();
 	}
 
 	@Override
 	public void deletePublisher(int publisherId) {
-		// TODO Auto-generated method stub
 		publisherRepository.deleteById((long) publisherId);
 
 	}
 
 	@Override
 	public Publishers find(long publisherId) {
-		// TODO Auto-generated method stub
-		return publisherRepository.findById(publisherId).get();
+		return publisherRepository.findById(publisherId);
 	}
 
 	@Override
 	public Long count() {
-		// TODO Auto-generated method stub
 		return publisherRepository.count();
 	}
 
 	@Override
 	public void delete(long id) {
-		// TODO Auto-generated method stub
 		publisherRepository.deleteById((long) id);
 	}
 
 	@Override
 	public Publishers findOne(long id) {
-		// TODO Auto-generated method stub
-		return publisherRepository.findById((long) id).get();
+		return publisherRepository.findById((long) id);
 	}
 
 	@Override
 	public void save(Publishers contact) {
-		// TODO Auto-generated method stub
 		publisherRepository.save(contact);
 	}
 

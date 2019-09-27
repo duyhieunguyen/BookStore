@@ -144,7 +144,7 @@ public class AdminController {
 		model.addAttribute("baseUrl", baseUrl);
 		model.addAttribute("list", pages);
 		
-		int pagesizeCP = 10;
+		int pagesizeCP = 15;
 		PagedListHolder<?> pagePubs = null;
 		PagedListHolder<?> pageCates = null;
 		List<Publishers> listPub = (List<Publishers>) publisherService.findAll();

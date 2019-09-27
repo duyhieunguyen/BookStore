@@ -23,6 +23,10 @@ tr {
 	font-weight: bold;
 	background-color: #C6C9C4;
 }
+span:hover {
+    color: red;
+    position: relative;
+}
 </style>
 <title>User's List</title>
 </head>
@@ -91,7 +95,7 @@ tr {
 							</tr>
 						</tbody>
 					</table>
-					<ul class="pagination" style="margin: -10px 0px 0px 0px;">
+					<ul class="pagination" style="margin: 10px 0px 0px 0px;">
 						<li
 							th:class="${currentIndex == 1}? 'page-item disabled' : 'page-item'">
 							<a class="page-link" th:href="@{|${baseUrl}1|}">First</a>

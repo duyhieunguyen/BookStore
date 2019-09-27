@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.support.PagedListHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -24,6 +25,9 @@ import pq.jdev.b001.bookstore.books.model.Book;
 import pq.jdev.b001.bookstore.books.service.BookService;
 import pq.jdev.b001.bookstore.books.web.dto.UploadInformationDTO;
 import pq.jdev.b001.bookstore.category.model.Category;
+import pq.jdev.b001.bookstore.category.service.CategoryService;
+import pq.jdev.b001.bookstore.publishers.model.Publishers;
+import pq.jdev.b001.bookstore.publishers.service.PublisherService;
 import pq.jdev.b001.bookstore.users.model.Person;
 import pq.jdev.b001.bookstore.users.service.UserService;
 
@@ -35,6 +39,12 @@ public class BookController {
 
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private PublisherService publisherService;
+
+	@Autowired
+	private CategoryService categoryService;
 
 	@ModelAttribute("dto")
 	public UploadInformationDTO dTO() {
@@ -64,6 +74,24 @@ public class BookController {
 			dto.setCategories(bookService.showAllCategories());
 			model.addAttribute("dto", dto);
 			model.addAttribute("currentUser", currentUser);
+			if (authentication != null) {
+				Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+				List<String> roles = new ArrayList<String>();
+				for (GrantedAuthority a : authorities) {
+					roles.add(a.getAuthority());
+				}
+
+				if (isUser(roles)) {
+					map.addAttribute("header", "header_user");
+					map.addAttribute("footer", "footer_user");
+				} else if (isAdmin(roles)) {
+					map.addAttribute("header", "header_admin");
+					map.addAttribute("footer", "footer_admin");
+				}
+			} else {
+				map.addAttribute("header", "header_login");
+				map.addAttribute("footer", "footer_login");
+			}
 			return "bookview/createform";
 		} catch (Exception e) {
 			if (authentication != null) {
@@ -72,7 +100,7 @@ public class BookController {
 				for (GrantedAuthority a : authorities) {
 					roles.add(a.getAuthority());
 				}
-				
+
 				if (isUser(roles)) {
 					map.addAttribute("header", "header_user");
 					map.addAttribute("footer", "footer_user");
@@ -91,10 +119,47 @@ public class BookController {
 	@PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
 	@PostMapping("/bookview/createform")
 	public String createBook(@AuthenticationPrincipal User user, UploadInformationDTO dto,
-			@RequestParam(value = "idChecked", required = false) List<String> categoriesId, Model model, ModelMap map, Authentication authentication) {
+			@RequestParam(value = "idChecked", required = false) List<String> categoriesId, Model model, ModelMap map,
+			Authentication authentication) {
 		try {
+			if (authentication != null) {
+				Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+				List<String> roles = new ArrayList<String>();
+				for (GrantedAuthority a : authorities) {
+					roles.add(a.getAuthority());
+				}
+
+				if (isUser(roles)) {
+					map.addAttribute("header", "header_user");
+					map.addAttribute("footer", "footer_user");
+				} else if (isAdmin(roles)) {
+					map.addAttribute("header", "header_admin");
+					map.addAttribute("footer", "footer_admin");
+				}
+			} else {
+				map.addAttribute("header", "header_login");
+				map.addAttribute("footer", "footer_login");
+			}
 			Person currentUser = userService.findByUsername(user.getUsername());
 			if (!bookService.checkInput(dto)) {
+				if (authentication != null) {
+					Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+					List<String> roles = new ArrayList<String>();
+					for (GrantedAuthority a : authorities) {
+						roles.add(a.getAuthority());
+					}
+
+					if (isUser(roles)) {
+						map.addAttribute("header", "header_user");
+						map.addAttribute("footer", "footer_user");
+					} else if (isAdmin(roles)) {
+						map.addAttribute("header", "header_admin");
+						map.addAttribute("footer", "footer_admin");
+					}
+				} else {
+					map.addAttribute("header", "header_login");
+					map.addAttribute("footer", "footer_login");
+				}
 				return "bookview/error";
 			}
 			bookService.save(dto, currentUser, categoriesId);
@@ -106,7 +171,7 @@ public class BookController {
 				for (GrantedAuthority a : authorities) {
 					roles.add(a.getAuthority());
 				}
-				
+
 				if (isUser(roles)) {
 					map.addAttribute("header", "header_user");
 					map.addAttribute("footer", "footer_user");
@@ -126,7 +191,7 @@ public class BookController {
 	@GetMapping("/bookview/editform/{id}")
 	public String initializeEditing(@AuthenticationPrincipal User user, UploadInformationDTO dto,
 			@PathVariable("id") String id, Model model, Authentication authentication, ModelMap map) {
-
+		
 		if (authentication != null) {
 			Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
 			List<String> roles = new ArrayList<String>();
@@ -145,7 +210,7 @@ public class BookController {
 			map.addAttribute("header", "header_login");
 			map.addAttribute("footer", "footer_login");
 		}
-
+		
 		try {
 			dto = new UploadInformationDTO();
 			Person currentUser = new Person();
@@ -217,12 +282,30 @@ public class BookController {
 			@RequestParam(value = "idChecked", required = false) List<String> categoriesId, Model model,
 			RedirectAttributes redirectAttributes, ModelMap map, Authentication authentication) {
 		try {
+			if (authentication != null) {
+				Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+				List<String> roles = new ArrayList<String>();
+				for (GrantedAuthority a : authorities) {
+					roles.add(a.getAuthority());
+				}
+
+				if (isUser(roles)) {
+					map.addAttribute("header", "header_user");
+					map.addAttribute("footer", "footer_user");
+				} else if (isAdmin(roles)) {
+					map.addAttribute("header", "header_admin");
+					map.addAttribute("footer", "footer_admin");
+				}
+			} else {
+				map.addAttribute("header", "header_login");
+				map.addAttribute("footer", "footer_login");
+			}
 			Person currentUser = new Person();
 			Long id = Long.parseLong(editBookId);
 			Book editBook = bookService.findBookByID(id);
 			currentUser = userService.findByUsername(user.getUsername());
 			if (!bookService.checkRightInteraction(user, editBook)) {
-				return "/login";
+				return "redirect:/login";
 			}
 			bookService.update(dto, currentUser, categoriesId, editBook);
 			return "bookview/success";
@@ -250,8 +333,45 @@ public class BookController {
 	}
 
 	@GetMapping("/bookview/infor/{id}")
-	public String showBookDetails(UploadInformationDTO dto, @PathVariable("id") String id, Model model, ModelMap map, Authentication authentication) {
+	public String showBookDetails(UploadInformationDTO dto, @PathVariable("id") String id, Model model, ModelMap map,
+			Authentication authentication) {
 		try {
+			if (authentication != null) {
+				Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+				List<String> roles = new ArrayList<String>();
+				for (GrantedAuthority a : authorities) {
+					roles.add(a.getAuthority());
+				}
+
+				if (isUser(roles)) {
+					map.addAttribute("header", "header_user");
+					map.addAttribute("footer", "footer_user");
+				} else if (isAdmin(roles)) {
+					map.addAttribute("header", "header_admin");
+					map.addAttribute("footer", "footer_admin");
+				}
+			} else {
+				map.addAttribute("header", "header_login");
+				map.addAttribute("footer", "footer_login");
+			}
+
+			int pagesizeCP = 15;
+			PagedListHolder<?> pagePubs = null;
+			PagedListHolder<?> pageCates = null;
+			List<Publishers> listPub = (List<Publishers>) publisherService.findAll();
+			List<Category> categoryList = categoryService.findAll();
+			if (pageCates == null) {
+				pageCates = new PagedListHolder<>(categoryList);
+				pageCates.setPageSize(pagesizeCP);
+			}
+			if (pagePubs == null) {
+				pagePubs = new PagedListHolder<>(listPub);
+				pagePubs.setPageSize(pagesizeCP);
+			}
+			model.addAttribute("publishers", pagePubs);
+			model.addAttribute("categories", pageCates);
+			model.addAttribute("book", new Book());
+
 			Long idCurrent = Long.parseLong(id);
 			Book currentBook = bookService.findBookByID(idCurrent);
 			dto.setTitle(currentBook.getTitle());
@@ -279,7 +399,7 @@ public class BookController {
 				for (GrantedAuthority a : authorities) {
 					roles.add(a.getAuthority());
 				}
-				
+
 				if (isUser(roles)) {
 					map.addAttribute("header", "header_user");
 					map.addAttribute("footer", "footer_user");

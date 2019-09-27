@@ -8,15 +8,23 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.support.PagedListHolder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import pq.jdev.b001.bookstore.category.model.Category;
+import pq.jdev.b001.bookstore.category.service.CategoryService;
+import pq.jdev.b001.bookstore.publishers.model.Publishers;
+import pq.jdev.b001.bookstore.publishers.service.PublisherService;
 
 @Controller
 
@@ -25,8 +33,15 @@ public class UploadController {
 	// Save the uploaded file to this folder
 	private static String UPLOADED_FOLDER = "C:/Users/laptop/Desktop/bookstore/src/main/resources/static/images/";
 
+	
+	@Autowired
+	private PublisherService publisherService;
+
+	@Autowired
+	private CategoryService categoryservice;
+	
 	@GetMapping("/upload")
-	public String viewUpLoad(Authentication authentication, ModelMap map) {
+	public String viewUpLoad(Authentication authentication, ModelMap map, Model model) {
 		if (authentication != null) {
 			Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
 			List<String> roles = new ArrayList<String>();
@@ -46,6 +61,21 @@ public class UploadController {
 			map.addAttribute("header", "header_login");
 			map.addAttribute("footer", "footer_login");
 		}
+		int pagesizeCP = 15;
+		PagedListHolder<?> pagePubs = null;
+		PagedListHolder<?> pageCates = null;
+		List<Publishers> listPub = (List<Publishers>) publisherService.findAll();
+		List<Category> categoryList = categoryservice.findAll();
+		if (pageCates == null) {
+			pageCates = new PagedListHolder<>(categoryList);
+			pageCates.setPageSize(pagesizeCP);
+		}
+		if (pagePubs == null) {
+			pagePubs = new PagedListHolder<>(listPub);
+			pagePubs.setPageSize(pagesizeCP);
+		}
+		model.addAttribute("publishers", pagePubs);
+		model.addAttribute("categories", pageCates);
 		return "upload";
 	}
 

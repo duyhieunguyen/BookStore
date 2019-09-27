@@ -54,7 +54,7 @@ public class LoginController {
 
 		PagedListHolder<?> pages = null;
 
-		int pagesize = 4;
+		int pagesize = 6;
 		List<Book> listH = null;
 		if (principal == null) {
 			listH = (List<Book>) listBookService.findAll();
@@ -85,7 +85,7 @@ public class LoginController {
 		model.addAttribute("baseUrl", baseUrl);
 		model.addAttribute("books", pages);
 
-		int pagesizeCP = 10;
+		int pagesizeCP = 15;
 		PagedListHolder<?> pagePubs = null;
 		PagedListHolder<?> pageCates = null;
 		List<Publishers> listPub = (List<Publishers>) publisherService.findAll();
@@ -129,7 +129,7 @@ public class LoginController {
 			Model model, ModelMap map, Principal principal) {
 
 		PagedListHolder<?> pages = null;
-		int pagesize = 4;
+		int pagesize = 6;
 		List<Book> list = null;
 		if (principal == null) {
 			list = (List<Book>) listBookService.findAll();
@@ -165,7 +165,7 @@ public class LoginController {
 		model.addAttribute("baseUrl", baseUrl);
 		model.addAttribute("books", pages);
 
-		int pagesizeCP = 10;
+		int pagesizeCP = 15;
 		PagedListHolder<?> pagePubs = null;
 		PagedListHolder<?> pageCates = null;
 		List<Publishers> listPub = (List<Publishers>) publisherService.findAll();
@@ -276,7 +276,7 @@ public class LoginController {
 					list.add(a);
 		}
 
-		int pagesize = 4;
+		int pagesize = 6;
 
 		pages = new PagedListHolder<>(list);
 		pages.setPageSize(pagesize);
@@ -304,7 +304,7 @@ public class LoginController {
 		model.addAttribute("baseUrl", baseUrl);
 		model.addAttribute("books", pages);
 
-		int pagesizeCP = 10;
+		int pagesizeCP = 15;
 		PagedListHolder<?> pagePubs = null;
 		PagedListHolder<?> pageCates = null;
 		List<Publishers> listPub = (List<Publishers>) publisherService.findAll();
@@ -349,7 +349,7 @@ public class LoginController {
 	}
 
 	@GetMapping(value = "/403")
-	public String accessDeniedPage(Authentication authentication, ModelMap map) {
+	public String accessDeniedPage(Authentication authentication, ModelMap map, Model model) {
 		if (authentication != null) {
 			Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
 			List<String> roles = new ArrayList<String>();
@@ -368,6 +368,23 @@ public class LoginController {
 			map.addAttribute("header", "header_login");
 			map.addAttribute("footer", "footer_login");
 		}
+		
+		int pagesizeCP = 15;
+		PagedListHolder<?> pagePubs = null;
+		PagedListHolder<?> pageCates = null;
+		List<Publishers> listPub = (List<Publishers>) publisherService.findAll();
+		List<Category> categoryList = categoryservice.findAll();
+		if (pageCates == null) {
+			pageCates = new PagedListHolder<>(categoryList);
+			pageCates.setPageSize(pagesizeCP);
+		}
+		if (pagePubs == null) {
+			pagePubs = new PagedListHolder<>(listPub);
+			pagePubs.setPageSize(pagesizeCP);
+		}
+		model.addAttribute("publishers", pagePubs);
+		model.addAttribute("categories", pageCates);
+		
 		return "403";
 	}
 

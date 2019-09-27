@@ -6,4 +6,5 @@ public interface UploadPathService {
 
 	public File getFilePath(String modifiedFileName, String path);
 
+	public void deleteAllUploadByIdBook(Long id);
 }

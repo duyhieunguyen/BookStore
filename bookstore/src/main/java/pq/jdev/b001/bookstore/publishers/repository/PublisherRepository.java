@@ -9,6 +9,8 @@ import pq.jdev.b001.bookstore.publishers.model.Publishers;
 @Repository
 public interface PublisherRepository extends CrudRepository<Publishers, Long>, JpaRepository<Publishers, Long> {
 
-	/* List<Publishers> findByName(String name); */
+	Publishers findById(long id);
+	
+	Publishers findByPublisher(String publisher);
 
 }

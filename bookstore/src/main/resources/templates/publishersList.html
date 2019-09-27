@@ -32,6 +32,11 @@
 span{
 	white-space: nowrap;
 }
+
+span:hover {
+    color: red;
+    position: relative;
+}
 </style>
 </head>
 
@@ -52,12 +57,12 @@ span{
 				<div style="margin: -26px 0px 0px 0px;">
 					<table class="table" align="center">
 						<thead>
-							<tr style="font-size: 9px;">
+							<tr style="font-size: 10px;">
 								<th>ID</th>
 								<th>PUBLISHINGHOUSE</th>
-								<th>CREATEDNAME</th>
+								<th>CREATEDID</th>
 								<th>CREATEDDATE</th>
-								<th>UPLOADNAME</th>
+								<th>UPLOADID</th>
 								<th>UPDATEDATE</th>
 								<th>Edit</th>
 								<th>Delete</th>
@@ -65,12 +70,12 @@ span{
 						</thead>
 						<tbody style="background: #C6C9C4">
 							<tr th:each="publisher:${publishersL.pageList}">
-								<td><span th:text="${publisher.id}">ID</span></td>
-								<td><span th:text="${publisher.publisher}">Publisher</span></td>
-								<td><span th:text="${publisher.createName}">CreateName</span></td>
-								<td><span th:text="${publisher.createDate}">CrateDate</span></td>
-								<td><span th:text="${publisher.updateName}">UploadName</span></td>
-								<td><span th:text="${publisher.updateDate}">UploadDate</span></td>
+								<td><span th:text="${publisher.id}" th:title="${publisher.id}">ID</span></td>
+								<td><span th:text="${publisher.publisher}" th:title="${publisher.publisher}">Publisher</span></td>
+								<td><span th:text="${publisher.createId}" th:title="${publisher.createId}">CreateId</span></td>
+								<td><span th:text="${publisher.createDate}"th:title="${publisher.createDate}">CrateDate</span></td>
+								<td><span th:text="${publisher.updateId}"th:title="${publisher.updateId}">UploadId</span></td>
+								<td><span th:text="${publisher.updateDate}"th:title="${publisher.updateDate}">UploadDate</span></td>
 								<td><a
 									th:href="@{/publisher/{id}/edit(id=${publisher.id})}"
 									class="btn btn-primary"><i class="fas fa-user-edit ml-2"></i></a></td>
@@ -80,7 +85,7 @@ span{
 						</tbody>
 					</table>
 
-					<ul class="pagination" style="margin: -10px 0px 0px 0px;">
+					<ul class="pagination" style="margin-top: 10px;">
 						<li
 							th:class="${currentIndex == 1}? 'page-item disabled' : 'page-item'">
 							<a class="page-link" th:href="@{|${baseUrl}1|}">First</a>

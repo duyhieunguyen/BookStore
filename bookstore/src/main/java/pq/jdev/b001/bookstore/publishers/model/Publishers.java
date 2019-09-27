@@ -1,5 +1,6 @@
 package pq.jdev.b001.bookstore.publishers.model;
 
+import java.sql.Timestamp;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -10,28 +11,33 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import pq.jdev.b001.bookstore.books.model.Book;
 
-@Entity(name = "Publish")
-@Table(name = "publish")
+@Entity
+@Table
 public class Publishers {
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	@Column(name = "PUBLISHINGHOUSE", columnDefinition = "VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_bin")
 	private String publisher;
 
-	@Column(name = "CREATEDUSER")
-	private String createName;
+	@Column(name = "CREATEDID")
+	private Long createId;
 
+	@CreationTimestamp
 	@Column(name = "CREATEDDATE")
-	private String createDate;
+	private Timestamp createDate;
 
-	@Column(name = "UPLOADUSER")
-	private String updateName;
+	@Column(name = "UPLOADID")
+	private Long updateId;
 
+	@UpdateTimestamp
 	@Column(name = "UPDATEDATE")
-	private String updateDate;
+	private Timestamp updateDate;
 
 	@OneToMany(mappedBy = "publisher")
 	private Set<Book> books;
@@ -39,6 +45,17 @@ public class Publishers {
 	public Publishers() {
 
 	}
+
+	public Publishers(String publisher, Timestamp createDate, Timestamp updateDate, Long createId,
+			Long updateId) {
+		this.publisher = publisher;
+		this.createDate = createDate;
+		this.updateDate = updateDate;
+		this.createId = createId;
+		this.updateId = updateId;
+	}
+
+
 
 	public Long getId() {
 		return id;
@@ -56,35 +73,28 @@ public class Publishers {
 		this.publisher = publisher;
 	}
 
-	public String getCreateName() {
-		return createName;
+
+	public Long getCreateId() {
+		return createId;
 	}
 
-	public void setCreateName(String createName) {
-		this.createName = createName;
+	public void setCreateId(Long createId) {
+		this.createId = createId;
 	}
 
-	public String getCreateDate() {
-		return createDate;
+	public Long getUpdateId() {
+		return updateId;
 	}
 
-	public void setCreateDate(String createDate) {
-		this.createDate = createDate;
+	public void setUpdateId(Long updateId) {
+		this.updateId = updateId;
 	}
 
-	public String getUpdateName() {
-		return updateName;
-	}
-
-	public void setUpdateName(String updateName) {
-		this.updateName = updateName;
-	}
-
-	public String getUpdateDate() {
+	public Timestamp getUpdateDate() {
 		return updateDate;
 	}
 
-	public void setUpdateDate(String updateDate) {
+	public void setUpdateDate(Timestamp updateDate) {
 		this.updateDate = updateDate;
 	}
 
@@ -96,21 +106,16 @@ public class Publishers {
 		this.books = books;
 	}
 
-	public Publishers(Long id, String publisher, String createName, String createDate, String updateName,
-			String updateDate) {
-		super();
-		this.id = id;
-		this.publisher = publisher;
-		this.createName = createName;
+	public Timestamp getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(Timestamp createDate) {
 		this.createDate = createDate;
-		this.updateName = updateName;
-		this.updateDate = updateDate;
 	}
 
-	@Override
-	public String toString() {
-		return "Publishers [id=" + id + ", publisher=" + publisher + ", createName=" + createName + ", createDate="
-				+ createDate + ", updateName=" + updateName + ", updateDate=" + updateDate + "]";
+	public Publishers(Long createId, Long updateId) {
+		this.createId = createId;
+		this.updateId = updateId;
 	}
-
 }

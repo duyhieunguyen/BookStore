@@ -7,6 +7,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -14,9 +15,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import pq.jdev.b001.bookstore.category.model.Category;
 import pq.jdev.b001.bookstore.publishers.model.Publishers;
@@ -34,12 +35,13 @@ public class Book implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "ID")
-	private long id;
+	private Long id;
 	
+	@NotEmpty
 	@Column(name = "TITLE", columnDefinition = "VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_bin")
 	private String title;
 	
-	@NotEmpty
+	@NotNull
 	@Column(name = "PRICE")
 	private Long price;
 
@@ -66,13 +68,14 @@ public class Book implements Serializable {
 	@JoinColumn(name = "PUBLISHER_ID ")
 	private Publishers publisher;
 
-	@ManyToMany(cascade = { CascadeType.ALL })
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinTable(name = "book_category", joinColumns = { @JoinColumn(name = "BOOK_ID") }, inverseJoinColumns = {
 			@JoinColumn(name = "CATEGORY_ID") })
 	private Set<Category> categories;
 
-	@OneToMany(mappedBy = "book")
-	private Set<Upload> uploads;
+	@ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "UPLOAD_ID")
+	private Upload uploads;
 	
 	@Column(name = "PUBLISHED_YEAR")
 	private Integer publishedYear;
@@ -80,11 +83,11 @@ public class Book implements Serializable {
 	@Column(name = "DESCRIPTION")
 	private String description;
 
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -100,7 +103,7 @@ public class Book implements Serializable {
 		return price;
 	}
 
-	public void setPrice(long price) {
+	public void setPrice(Long price) {
 		this.price = price;
 	}
 
@@ -160,11 +163,11 @@ public class Book implements Serializable {
 		this.categories = categories;
 	}
 
-	public Set<Upload> getUploads() {
+	public Upload getUploads() {
 		return uploads;
 	}
 
-	public void setUploads(Set<Upload> uploads) {
+	public void setUploads(Upload uploads) {
 		this.uploads = uploads;
 	}
 
@@ -191,5 +194,5 @@ public class Book implements Serializable {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-
+	
 }

@@ -166,7 +166,8 @@
 	white-space: nowrap;
 	margin: 0px 0px -3px 0px;
 	max-height: 40px !important;
-	position: absolute;
+	position: unset ;
+	display: inline-block;
 }
 
 .form-group .font {

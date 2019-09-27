@@ -13,10 +13,20 @@
 </head>
 <body>
 	<nav th:replace="indexheader :: ${header}" ></nav>
-	<br>
-	<div id="error">
-		 <h2>403 Error: Access denied</h2>
+	<div id="templatemo_container">
+		<div id="templatemo_content">
+			<div id="templatemo_content_left">
+				<nav th:replace="indexheader :: templatemo_content_left_sec"></nav>
+			</div>
+			<div id="templatemo_content_right">
+			<br>
+				<div id="error">
+		 			<h2>403 Error: Access denied</h2>
+				</div>
+			</div>
+		</div>
 	</div>
+	<div class="cleaner_with_height">&nbsp;</div>
     <footer th:replace="indexheader :: ${footer}"></footer>
 </body>
 </html>

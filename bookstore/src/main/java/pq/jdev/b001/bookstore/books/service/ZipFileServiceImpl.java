@@ -13,8 +13,8 @@ import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Controller;
 
-@Transactional
 @Controller
+@Transactional
 public class ZipFileServiceImpl implements ZipFileService {
 	List<String> filesListInDir = new ArrayList<String>();
 

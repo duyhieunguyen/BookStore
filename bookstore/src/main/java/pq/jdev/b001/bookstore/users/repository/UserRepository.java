@@ -24,12 +24,12 @@ public interface UserRepository extends JpaRepository<Person, Long>, CrudReposit
 	@Modifying
     @Query("Delete from PasswordResetToken where personid = :id")
     void deleteByIdPRT(@Param("id") Long id);
-	
-	@Modifying
-	@Query("Update Book b set b.person.id = :idTo where b.person.id = :idFrom")
-	void changeAuthorize(@Param("idTo") Long idTo, @Param("idFrom") Long idFrom);
     
     Person findByEmail(String email);
     Person findByUsername(String username);
     Person findById(long id);
+    
+    @Modifying
+	@Query("Update Book b set b.person.id = :idTo where b.person.id = :idFrom")
+	void changeAuthorize(@Param("idTo")Long idTo, @Param("idFrom") Long idFrom);
 }

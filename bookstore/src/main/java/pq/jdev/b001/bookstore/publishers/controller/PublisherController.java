@@ -1,5 +1,6 @@
 package pq.jdev.b001.bookstore.publishers.controller;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -22,10 +23,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import pq.jdev.b001.bookstore.books.service.BookService;
 import pq.jdev.b001.bookstore.category.model.Category;
 import pq.jdev.b001.bookstore.category.service.CategoryService;
 import pq.jdev.b001.bookstore.publishers.model.Publishers;
 import pq.jdev.b001.bookstore.publishers.service.PublisherService;
+import pq.jdev.b001.bookstore.users.service.UserService;
 
 @Controller
 public class PublisherController {
@@ -56,9 +59,16 @@ public class PublisherController {
 
 	@Autowired
 	private CategoryService categoryservice;
+	
+	@Autowired
+	private UserService userService;
+	
+	@Autowired
+	private BookService bookService;
 
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/publisher/add")
-	public String create(Model model,ModelMap map, Authentication authentication) {
+	public String create(Model model,ModelMap map, Authentication authentication, HttpServletRequest request) {
 		if (authentication != null) {
 			Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
 			List<String> roles = new ArrayList<String>();
@@ -80,7 +90,7 @@ public class PublisherController {
 				map.addAttribute("footer", "footer_login");
 		}
 		
-		int pagesizeCP = 10;
+		int pagesizeCP = 15;
 		PagedListHolder<?> pagePubs = null;
 		PagedListHolder<?> pageCates = null;
 		List<Publishers> listPub = (List<Publishers>) publisherService.findAll();
@@ -96,38 +106,55 @@ public class PublisherController {
 		model.addAttribute("publishers", pagePubs);
 		model.addAttribute("categories", pageCates);
 		
-		model.addAttribute("publisher", new Publishers());
+		Long idP = userService.findByUsername(authentication.getName()).getId();
+		request.getSession().setAttribute("idC", idP);
+		request.getSession().setAttribute("idU", idP);
+		model.addAttribute("publisher", new Publishers(idP, idP));
+		java.util.Date date= new java.util.Date();
+		long time = date.getTime();
+		Timestamp ts = new Timestamp(time);
+		map.addAttribute("cd", ts);
+		map.addAttribute("ud", ts);
 		return "publisherAdd";
 	}
 	
 	@PostMapping("/publisher/save")
-	public String savePublisher(@Valid Publishers publishers, BindingResult result, RedirectAttributes redirect) {
+	public String savePublisher(@Valid Publishers publishers, BindingResult result, RedirectAttributes redirect, HttpServletRequest request) {
 		if (result.hasErrors()) {
 			return "publisherAdd";
 			}
+		Long idPub = (Long) request.getSession().getAttribute("idPub");
+		if (idPub == publishers.getId())
+			publishers.setCreateDate((Timestamp)request.getSession().getAttribute("cd"));
+		publishers.setCreateId((Long)request.getSession().getAttribute("idC"));
+		publishers.setUpdateId((Long)request.getSession().getAttribute("idU"));
 		publisherService.save(publishers);
 		return "redirect:/publishersList";
 	}
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/publishersList")
-	public String viewPublishersList(Model model, ModelMap map, HttpServletRequest request) {
-		map.addAttribute("header", "header_admin");
-		map.addAttribute("footer", "footer_admin");
+	public String viewPublishersList() {
 		return "redirect:/publishersList/page/1";
 	}
 
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/publisher/{id}/delete")
-	public String delete(@PathVariable int id, RedirectAttributes redirect) {
-		publisherService.delete(id);
+	public String delete(@PathVariable Long id, RedirectAttributes redirect, Authentication authentication) {
+		if (authentication != null && id != (long) 1)
+		{
+			bookService.changePublisher(id, (long) 1);
+			publisherService.delete(id);
+		}
 		return "redirect:/publishersList";
 	}
 
 	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/publisher/{id}/edit")
-	public String edit(@PathVariable int id, Model model, ModelMap map) {
+	public String edit(@PathVariable int id, Model model, ModelMap map, HttpServletRequest request, Authentication authentication) {
 		map.addAttribute("header", "header_admin");
 		map.addAttribute("footer", "footer_admin");
-		int pagesizeCP = 10;
+		int pagesizeCP = 15;
 		PagedListHolder<?> pagePubs = null;
 		PagedListHolder<?> pageCates = null;
 		List<Publishers> listPub = (List<Publishers>) publisherService.findAll();
@@ -142,7 +169,19 @@ public class PublisherController {
 		}
 		model.addAttribute("publishers", pagePubs);
 		model.addAttribute("categories", pageCates);
-		model.addAttribute("publisher", publisherService.find(id));
+		Publishers pub = publisherService.find(id);
+		request.getSession().setAttribute("cd", pub.getCreateDate());
+		request.getSession().setAttribute("idPub", pub.getId());
+		model.addAttribute("publisher", pub);
+		
+		Long idP = userService.findByUsername(authentication.getName()).getId();
+		request.getSession().setAttribute("idC", pub.getCreateId());
+		request.getSession().setAttribute("idU", idP);
+		java.util.Date date= new java.util.Date();
+		long time = date.getTime();
+		Timestamp ts = new Timestamp(time);
+		map.addAttribute("cd", pub.getCreateDate());
+		map.addAttribute("ud", ts);
 		return "publisherAdd";
 	}
 
@@ -160,7 +199,7 @@ public class PublisherController {
 		map.addAttribute("header", "header_admin");
 		map.addAttribute("footer", "footer_admin");
 		
-		int pagesize = 6;
+		int pagesize = 8;
 		List<Publishers> list = (List<Publishers>) publisherService.findAll();
 		PagedListHolder<?> pages = new PagedListHolder<>(list);
 		pages.setPageSize(pagesize);
@@ -183,7 +222,7 @@ public class PublisherController {
 		model.addAttribute("baseUrl", baseUrl);
 		model.addAttribute("publishersL", pages);
 		
-		int pagesizeCP = 10;
+		int pagesizeCP = 15;
 		PagedListHolder<?> pagePubs = null;
 		PagedListHolder<?> pageCates = null;
 		List<Publishers> listPub = (List<Publishers>) publisherService.findAll();

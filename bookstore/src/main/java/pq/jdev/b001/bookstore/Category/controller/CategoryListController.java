@@ -1,5 +1,6 @@
 package pq.jdev.b001.bookstore.category.controller;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -7,62 +8,53 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.support.PagedListHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import pq.jdev.b001.bookstore.books.service.BookService;
 import pq.jdev.b001.bookstore.category.model.Category;
 import pq.jdev.b001.bookstore.category.service.CategoryService;
-import pq.jdev.b001.bookstore.category.web.CategoryWeb;
 import pq.jdev.b001.bookstore.publishers.model.Publishers;
 import pq.jdev.b001.bookstore.publishers.service.PublisherService;
-
-/*
- * CategoryListController Class
- * 
- * Java 12
- * 
- * 17/08/2019
- * 
- * author @nphtu
- * 
- * */
+import pq.jdev.b001.bookstore.users.service.UserService;
 
 @PreAuthorize("hasRole('ADMIN')")
 @Controller
 public class CategoryListController {
 	@Autowired
-	private CategoryService categoryservice;
+	private CategoryService categoryService;
 
 	@Autowired
 	private PublisherService publisherService;
+	
+	@Autowired
+	private BookService bookService;
 
-	@ModelAttribute("category")
-	public CategoryWeb categoryweb() {
-		return new CategoryWeb();
-	}
+	@Autowired
+	private UserService userService;
 
-	@GetMapping("/categorylist")
+	@GetMapping("/categoryList")
 	public String index(Model model, HttpServletRequest request, RedirectAttributes redirect) {
 		request.getSession().setAttribute("listCategory", null);
 
 		if (model.asMap().get("success") != null)
 			redirect.addFlashAttribute("success", model.asMap().get("success").toString());
-		return "redirect:/categorylist/page/1";
+		return "redirect:/categoryList/page/1";
 	}
 
-	@GetMapping("/categorylist/page/{pageNumber}")
+	@GetMapping("/categoryList/page/{pageNumber}")
 	public String ListForm(HttpServletRequest request, @PathVariable int pageNumber, Model model, ModelMap map) {
 		map.addAttribute("header", "header_admin");
 		map.addAttribute("footer", "footer_admin");
 		PagedListHolder<?> pageLs = (PagedListHolder<?>) request.getSession().getAttribute("listCategory");
-		int pagesize = 4;
-		List<Category> categoryList = categoryservice.findAll();
+		int pagesize = 9;
+		List<Category> categoryList = categoryService.findAll();
 		if (pageLs == null) {
 			pageLs = new PagedListHolder<>(categoryList);
 			pageLs.setPageSize(pagesize);
@@ -77,7 +69,7 @@ public class CategoryListController {
 		int begin = Math.max(1, current - categoryList.size());
 		int end = Math.min(begin + 5, pageLs.getPageCount());
 		int totalPageCount = pageLs.getPageCount();
-		String baseUrl = "/categorylist/page/";
+		String baseUrl = "/categoryList/page/";
 
 		model.addAttribute("beginIndex", begin);
 		model.addAttribute("endIndex", end);
@@ -86,7 +78,7 @@ public class CategoryListController {
 		model.addAttribute("baseUrl", baseUrl);
 		model.addAttribute("categoryL", pageLs);
 
-		int pagesizeCP = 10;
+		int pagesizeCP = 15;
 		PagedListHolder<?> pagePubs = null;
 		PagedListHolder<?> pageCates = null;
 		List<Publishers> listPub = (List<Publishers>) publisherService.findAll();
@@ -104,23 +96,67 @@ public class CategoryListController {
 		return "categoryList";
 	}
 
-	@GetMapping("/categorylist/delete/{id}")
-	public String delete(@PathVariable long id, RedirectAttributes redirect) {
-		categoryservice.delete(id);
-		redirect.addFlashAttribute("success", "Deleted book successfully!");
-		return "redirect:/categorylist";
+	@GetMapping("/categoryList/delete/{id}")
+	public String delete(@PathVariable Long id, RedirectAttributes redirect, Authentication authentication) {
+		if (id == (long)(1))
+			return "redirect:/categoryList";
+		if ((authentication != null) && (id != (long)(1))) {
+			bookService.changeCategory((long) 1, id);
+			categoryService.delete(id);
+			redirect.addFlashAttribute("success", "Deleted category successfully!");
+		} 
+		return "redirect:/categoryList";
 	}
 
-	@GetMapping("/categorylist/search/{pageNumber}")
+	@GetMapping("/categoryList/edit/{id}")
+	public String edit(@PathVariable long id, RedirectAttributes redirect, ModelMap map, Model model,
+			HttpServletRequest request, Authentication authentication) {
+		map.addAttribute("header", "header_admin");
+		map.addAttribute("footer", "footer_admin");
+		int pagesizeCP = 15;
+		PagedListHolder<?> pagePubs = null;
+		PagedListHolder<?> pageCates = null;
+		List<Publishers> listPub = (List<Publishers>) publisherService.findAll();
+		List<Category> categoryList = categoryService.findAll();
+		if (pageCates == null) {
+			pageCates = new PagedListHolder<>(categoryList);
+			pageCates.setPageSize(pagesizeCP);
+		}
+		if (pagePubs == null) {
+			pagePubs = new PagedListHolder<>(listPub);
+			pagePubs.setPageSize(pagesizeCP);
+		}
+		model.addAttribute("publishers", pagePubs);
+		model.addAttribute("categories", pageCates);
+
+		Long idP = userService.findByUsername(authentication.getName()).getId();
+		Category cate = categoryService.findCategoryByID(id);
+
+		model.addAttribute("category", cate);
+		request.getSession().setAttribute("cd", cate.getCreateDate());
+		request.getSession().setAttribute("idCate", cate.getId());
+		request.getSession().setAttribute("idC", cate.getCreateId());
+		request.getSession().setAttribute("idU", idP);
+
+		java.util.Date date = new java.util.Date();
+		long time = date.getTime();
+		Timestamp ts = new Timestamp(time);
+		map.addAttribute("cd", cate.getCreateDate());
+		map.addAttribute("ud", ts);
+		redirect.addFlashAttribute("success", "Update category successfully!");
+		return "categoryadd";
+	}
+
+	@GetMapping("/categoryList/search/{pageNumber}")
 	public String search(@RequestParam("s") String s, Model model, HttpServletRequest request,
 			@PathVariable int pageNumber, ModelMap map) {
 		map.addAttribute("header", "header_admin");
 		map.addAttribute("footer", "footer_admin");
-		int pagesizeCP = 10;
+		int pagesizeCP = 15;
 		PagedListHolder<?> pagePubs = null;
 		PagedListHolder<?> pageCates = null;
 		List<Publishers> listPub = (List<Publishers>) publisherService.findAll();
-		List<Category> listCate = categoryservice.findAll();
+		List<Category> listCate = categoryService.findAll();
 		if (pageCates == null) {
 			pageCates = new PagedListHolder<>(listCate);
 			pageCates.setPageSize(pagesizeCP);
@@ -132,12 +168,12 @@ public class CategoryListController {
 		model.addAttribute("publishers", pagePubs);
 		model.addAttribute("categories", pageCates);
 		if (s.equals("")) {
-			return "redirect:/categorylist";
+			return "redirect:/categoryList";
 		}
 
-		List<Category> categoryList = categoryservice.findByName(s);
+		List<Category> categoryList = categoryService.findByName(s);
 		if (categoryList == null) {
-			return "redirect:/categorylist";
+			return "redirect:/categoryList";
 		}
 		PagedListHolder<?> pageLs = (PagedListHolder<?>) request.getSession().getAttribute("listCategory");
 		int pagesize = 4;
@@ -155,7 +191,7 @@ public class CategoryListController {
 		int begin = Math.max(1, current - categoryList.size());
 		int end = Math.min(begin + 5, pageLs.getPageCount());
 		int totalPageCount = pageLs.getPageCount();
-		String baseUrl = "/categorylist/search/";
+		String baseUrl = "/categoryList/search/";
 
 		model.addAttribute("beginIndex", begin);
 		model.addAttribute("endIndex", end);

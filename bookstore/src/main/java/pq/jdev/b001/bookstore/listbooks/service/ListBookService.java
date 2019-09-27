@@ -15,9 +15,9 @@ public interface ListBookService {
 	
 //    List<Book> search(String q);
 
-    Book findOne(long id);
+    Book findOne(Long id);
 
     void save(Book contact);
 
-    void delete(long id);
+    void delete(Long id);
 }
